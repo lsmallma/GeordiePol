@@ -1,0 +1,65 @@
+
+###
+## Control script for pollen deposition model
+###
+
+# The model is a R based pollen dispersion model.
+# The model allows for calibration of model parameters 
+# given known contempary data and subsequent application 
+# of these parameters for paleo-ecological studies 
+# to assess the senstivity of lakes to change in ecosystem composition.
+
+# Novel in this application is the propogation of parameter uncertainties
+# and iteration of the hypothetical land surfaces. Therefore, robust 
+# probability based estimates can be made (i.e. using Monte Carlo approaches).
+
+## Technical options
+use_parallel=FALSE # 
+nos_cores=2 # 
+deposition_model=3 # 1 = d**-1, 2 = d**-2, 3 = Sugita Prentice
+nos_iter=16
+
+## Domain extent
+domain_extent_x=300 # extant of domain (pixels)
+domain_extent_y=300 # extant of domain (pixels)
+resolution=100 # resolution / pixel size (m)
+
+## Species composition 
+random_or_read="read" # are we making up or reading in a landscape
+input_type="netcdf" # currently netcdf or tiff
+input_filename="/home/lsmallma/Desktop/laguna_coitaramaforest_map_100m_resolution_with_lat_long.nc" # only used for read map
+ecotone=FALSE # solid blocks of ecosystem rather than patch work (assumes 50:50 ratio as stating point before clearance)
+weighted_patch=FALSE  # assume some weighting towards or aware from the lake
+map_fixed=TRUE # i.e. does it change between iterations
+show_map=FALSE  # generate plots of the first and last maps used in iteration
+nos_species=2  # number of taxa considered
+sp_fractions=c(80,20) #  percentage of each taxa overall, must equal 100 %
+patch_size=1600 # forest clearance patches (radius, m)
+
+## Lake location and size
+lake_size=1600 # radius of lake (m)
+lake_centred = FALSE # lake fixed to centre of domain or placed randomly
+lake_fixed = TRUE # will lake be in the same location at all times
+lake_specified = FALSE #  will the user give x,y pixel coordinates for lake centre
+lake_user_x = 250 # rep(250,times=7) # pixel coordinates for the lake centre
+lake_user_y = 250 # c(250,225,200,175,150,125,100) # y becomes less to move away from forest luke # pixel coordinates for the lake centre
+
+## Parameters for Presentice (Sutton 1953; Prentice 1988) deposition model (option 3)
+wind_sp=3    # wind speed (m.s-1)
+fall_speed=c(0.018,0.0350)   # fall speed (m.s-1) of pollen; 0 = internal calculation
+pollen_radius=10e-6          # radius of pollen grain (m)
+pollen_productivity=c(1,1.5) # runif(1,0,15)
+
+## physical constants which you are unlikely to want to change
+gamma=0.125  # turbulence parameter = 2*gamma
+diffusion_coefficient=0.12 # 0.3 # Vertical diffusion coefficient (m^1/8)
+gravity=9.81 # gravity (m s-2)
+rho0=2e6     # particle density (g m-3)
+rho=1.27e6   # air density density (g m-3)
+mu=1.8e-2    # dynamic viscosity (g m-1 s-1)
+##
+
+## load the required functins
+source("./src/r_code/functions_pollen_deposition_model.r")
+## now call the model
+run_model()
